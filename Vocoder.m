@@ -4,36 +4,36 @@ classdef Vocoder
         
         % Analysis Parameters
         analysis = struct('LowF', 50 ...
-            ,'HighF', 12000 ...
-            ,'Nchannels',8 ...
-            ,'Method', 'Butterworth'...
-            ,'Order', 4 ...
-            ,'FreqAllocation','Greenwood'...
-            );
+                        ,'HighF', 8000 ...
+                        ,'Nchannels',8 ...
+                        ,'Method', 'Butterworth'...
+                        ,'Order', 4 ...
+                        ,'FreqAllocation','Greenwood'...
+                        );
         
         % Synthesis Parameters
         synthesis = struct('CarrierType', 'Tone'...
-            ,'FrequencyShift_mm', 6 ...
-            ,'Routing',[]...
-            ,'Carriers_CF',[]...
-            ,'FrequencyShiftMethod', 'fix_mm' ... % 'Cochlear', 'Medel', 'AB', 'Custom' or 'Noshift'
-            ,'CarrierPhase', 0 ...
-            ,'Delay', [0 0] ... % Delay value (in seconds)
-            ,'DelayType', 'WAV'... % TFS (carrier), ENV (envelope), WAV (waveform)
-            ,'DelayChannels', 'LR'... % On what channels apply an ITD: 'HR' (High-rate), 'LR' (Low-rate), 'all' (All channels)
-            );
+                        ,'FrequencyShift_mm', 6 ...
+                        ,'Routing',[]...
+                        ,'Carriers_CF',[]...
+                        ,'FrequencyShiftMethod', 'fix_mm' ... % 'Cochlear', 'Medel', 'AB', 'Custom' or 'Noshift'
+                        ,'CarrierPhase', 0 ...
+                        ,'Delay', [0 0] ... % Delay value (in seconds)
+                        ,'DelayType', 'WAV'... % TFS (carrier), ENV (envelope), WAV (waveform)
+                        ,'DelayChannels', 'LR'... % On what channels apply an ITD: 'HR' (High-rate), 'LR' (Low-rate), 'all' (All channels)
+                        );
         
         % Envelope extraction parameters
         envelopeExtraction = struct('Method','Halfwave'...
-            ,'LPcutoff', 400 ...
-            );
+                                   ,'LPcutoff', 400 ...
+                                  );
         
         % Mixed Rates parameters
         mixedRates = struct('MixedRates', true ...
-            ,'Distribution','AllLow'...
-            ,'HighPulseRate', 1000 ...
-            ,'LowPulseRate', 100 ...
-            );
+                            ,'Distribution','AllLow'...
+                            ,'HighPulseRate', 1000 ...
+                            ,'LowPulseRate', 100 ...
+                            );
         
         
     end
@@ -103,12 +103,14 @@ classdef Vocoder
             % Recompute Analysis Filters
             obj = designAnalysisFilters(obj);
         end
+        
         function obj = set.synthesis(obj,synthesisStruct)
             if ~isstruct(synthesisStruct)
                 % Erreur
             else
                obj.synthesis = synthesisStruct; 
-            end           
+            end  
+            
         end
         
         
@@ -326,7 +328,7 @@ classdef Vocoder
         % ------------------------
         function [VocoderObj, delayedEnvelopes] = applyDelay(VocoderObj, delay, envelopes)
             disp('Applying Delay')
-%             delay = VocoderObj.synthesis.Delay;
+
             delaySamples = round(delay*VocoderObj.SampleRate);
             delayChannels = VocoderObj.synthesis.DelayChannels;
             Nchannels = size(envelopes,2);
@@ -568,91 +570,22 @@ classdef Vocoder
         %-----------------------------------
         function vocParameters = printParameters(VocObj)
             
-            
-%            SampleRate = 44100;
-%         
-%         % Analysis Parameters
-%         analysis = struct('LowF', 50 ...
-%             ,'HighF', 12000 ...
-%             ,'Nchannels',8 ...
-%             ,'Method', 'Butterworth'...
-%             ,'Order', 4 ...
-%             ,'FreqAllocation','Greenwood'...
-%             );
-%         
-%         % Synthesis Parameters
-%         synthesis = struct('CarrierType', 'Tone'...
-%             ,'FrequencyShift_mm', 6 ...
-%             ,'Routing',[]...
-%             ,'Carriers_CF',[]...
-%             ,'FrequencyShiftMethod', 'fix_mm' ... % 'Cochlear', 'Medel', 'AB', 'Custom' or 'Noshift'
-%             ,'CarrierPhase', 0 ...
-%             ,'Delay', 0 ... % Delay value (in seconds)
-%             ,'DelayType', 'WAV'... % TFS (carrier), ENV (envelope), WAV (waveform)
-%             ,'DelayChannels', 'LR'... % On what channels apply an ITD: 'HR' (High-rate), 'LR' (Low-rate), 'all' (All channels)
-%             );
-%         
-%         % Envelope extraction parameters
-%         envelopeExtraction = struct('Method','Halfwave'...
-%             ,'LPcutoff', 400 ...
-%             );
-%         
-%         % Mixed Rates parameters
-%         mixedRates = struct('MixedRates', true ...
-%             ,'Distribution','AllLow'...
-%             ,'HighPulseRate', 1000 ...
-%             ,'LowPulseRate', 100 ...
-%             );
-         
-            
+        vocParameters = sprintf('Sample Rate: %d', VocObj.SampleRate);
+        vocParameters = horzcat(vocParameters, sprintf('\n\n-----ANALYSIS SETTINGS-------\n'));
 
-%     
-%     
-%     vocSettings = horzcat(vocSettings, sprintf('\n\n -----SYNTHESIS SETTINGS-------\n'));
-%     vocSettings = horzcat( vocSettings, sprintf('\nCarrier: %s', vocoderObj.synthesis.CarrierType));
-%     vocSettings = horzcat( vocSettings, sprintf('\nCarrier Center Frequencies: %s', array2str(vocoderObj.SynthesisComputations.Carriers_CF,',')));
-%     
-%     if ischar(vocoderObj.synthesis.CarrierType)
-%         vocSettings = horzcat( vocSettings, sprintf('\nCarrier Phase: %s', vocoderObj.synthesis.CarrierType));
-%     else
-%         vocSettings = horzcat( vocSettings, sprintf('\nCarrier Phase: %d', vocoderObj.synthesis.CarrierType));
-%     end
-%     vocSettings = horzcat(vocSettings, sprintf('\nFrequency Shift: %d mm', vocoderObj.synthesis.FrequencyShift_mm));
-%     vocSettings = horzcat(vocSettings, sprintf('\nFrequency Shift Method: %s', vocoderObj.synthesis.FrequencyShiftMethod));
-%     vocSettings = horzcat(vocSettings, sprintf('\nInteraural Time Difference (ITD): %.2eµs %.2eµs (Left/Right channels)', vocoderObj.synthesis.Delay));
-%     vocSettings = horzcat(vocSettings, sprintf('\nITD applied on: %s', vocoderObj.synthesis.DelayType));
-%     vocSettings = horzcat(vocSettings, sprintf('\nITD applied on: %s channels', vocoderObj.synthesis.DelayChannels));
-%     
-%     
-%     
-%     vocSettings = horzcat(vocSettings, sprintf('\n\n -----ENVELOPE EXTRACTION SETTINGS-------\n'));
-%     vocSettings = horzcat(vocSettings, sprintf('\nMethod: %s', vocoderObj.envelopeExtraction.Method));
-%     vocSettings = horzcat(vocSettings, sprintf('\nLow-pass cutoff: %d Hz', vocoderObj.envelopeExtraction.LPcutoff));
-%     
-%     vocSettings = horzcat(vocSettings, '\n\n -----MIXED RATES SETTINGS-------\n');
-%     if vocoderObj.mixedRates.MixedRates
-%         vocSettings = horzcat(vocSettings, sprintf('\nDistribution: %s', vocoderObj.mixedRates.Distribution));
-%         vocSettings = horzcat(vocSettings, sprintf('\nHigh Pulse Rate: %d pps', vocoderObj.mixedRates.HighPulseRate));
-%         vocSettings = horzcat(vocSettings, sprintf('\nLow Pulse Rate: %d pps', vocoderObj.mixedRates.LowPulseRate));
-%     else
-%         vocSettings = horzcat(vocSettings, sprintf('\nNo Mixed Rates were used.'));
-%     end
-
-        vocParameters = sprintf('-----ANALYSIS SETTINGS-------\n');
-        
         vocParameters = horzcat( vocParameters, sprintf('\nFirst Corner frequency: %d Hz', VocObj.analysis.LowF));
         vocParameters = horzcat(vocParameters, sprintf('\nLast corner frequency: %d Hz', VocObj.analysis.HighF));
-        vocParameters = horzcat(vocParameters, sprintf('\nCenter frequencies: %s', array2str(VocObj.AnalysisComputations.CenterFreq,',')));
+        vocParameters = horzcat(vocParameters, sprintf('\nCenter frequencies (Hz): %s', array2str(VocObj.AnalysisComputations.CenterFreq,',')));
         vocParameters = horzcat(vocParameters, sprintf('\nNumber of Channels: %d', VocObj.analysis.Nchannels));
         vocParameters = horzcat(vocParameters, sprintf('\nFilter type: %s', VocObj.analysis.Method));
         vocParameters = horzcat(vocParameters, sprintf('\nFilter Order: %d', VocObj.analysis.Order));
         vocParameters = horzcat(vocParameters, sprintf('\nFrequency Allocation: %s', VocObj.analysis.FreqAllocation));
-        
-        vocParameters = horzcat(vocParameters, sprintf('\n\n -----SYNTHESIS SETTINGS-------\n'));
-        
+
+        vocParameters = horzcat(vocParameters, sprintf('\n\n-----SYNTHESIS SETTINGS-------\n'));
+
         vocParameters = horzcat( vocParameters, sprintf('\nCarrier Type: %s', VocObj.synthesis.CarrierType));
         if ~isempty(VocObj.SynthesisComputations.Carriers_CF)
-            vocParameters = horzcat( vocParameters, sprintf('\nCarrier Center Frequencies: %s', array2str(VocObj.SynthesisComputations.Carriers_CF,',')));
+            vocParameters = horzcat( vocParameters, sprintf('\nCarrier Center Frequencies (Hz): %s', array2str(VocObj.SynthesisComputations.Carriers_CF,',')));
         end
         if ischar(VocObj.synthesis.CarrierPhase)
             vocParameters = horzcat( vocParameters, sprintf('\nCarrier Phase: %s', VocObj.synthesis.CarrierPhase));
@@ -663,11 +596,25 @@ classdef Vocoder
         if strcmp(VocObj.synthesis.FrequencyShiftMethod, 'fix_mm')
             vocParameters = horzcat(vocParameters, sprintf('\nFrequency Shift: %d mm', VocObj.synthesis.FrequencyShift_mm));
         end
-        vocParameters = horzcat(vocParameters, sprintf('\nInteraural Time Difference (ITD): %.2eµs %.2eµs (Left/Right channels)', VocObj.synthesis.Delay));
-        vocParameters = horzcat(vocParameters, sprintf('\nITD applied on: %s of %s channels', VocObj.synthesis.DelayType, VocObj.synthesis.DelayChannels));        
+        vocParameters = horzcat(vocParameters, sprintf('\nDelays on each audio channel: %.2eµs %.2eµs', VocObj.synthesis.Delay));
+        vocParameters = horzcat(vocParameters, sprintf('\nDelay applied on: %s of %s channels', VocObj.synthesis.DelayType, VocObj.synthesis.DelayChannels));
 
+        vocParameters = horzcat(vocParameters, sprintf('\n\n-----ENVELOPE EXTRACTION SETTINGS-------\n'));
+        vocParameters = horzcat(vocParameters, sprintf('\nMethod: %s', VocObj.envelopeExtraction.Method));
+        vocParameters = horzcat(vocParameters, sprintf('\nLow-pass cutoff: %d Hz', VocObj.envelopeExtraction.LPcutoff));
+        
+                   
+        if VocObj.mixedRates.MixedRates
+            vocParameters = horzcat(vocParameters, sprintf('\n\n-----MIXED RATES SETTINGS-------\n'));
+            vocParameters = horzcat(vocParameters, sprintf('\nDistribution: %s', VocObj.mixedRates.Distribution));
+            vocParameters = horzcat(vocParameters, sprintf('\nHigh Sample Rate: %d Hz', VocObj.mixedRates.HighPulseRate));
+            vocParameters = horzcat(vocParameters, sprintf('\nLow Sample Rate: %d Hz', VocObj.mixedRates.LowPulseRate));
+        
         end
-    end
+        
+        
+        end % end printParameters
+    end % end methods
     
     
     
