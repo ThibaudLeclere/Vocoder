@@ -66,27 +66,44 @@ classdef Vocoder
         % ---- CONSTRUCTOR
         % ---------------
         function obj = Vocoder(varargin)
-            
+            displayCommandWindow('Creating new Vocoder Object', 70)
             if nargin == 0 % If no argument are passed in, create a default Vocoder (this occurs when initializing an array of Vocoder objects)
                 obj = designAnalysisFilters(obj);
             end
             
-            if nargin > 0     
-                % Check that all required fields are present in the
-                % analysis structure. If not, replace by the default value.
-                obj.analysis = varargin{1};
+            if nargin > 0 % Set Analysis structure
+                enteredAnalysis = varargin{1};
+                              
+                % Check that analysis input is a structure
+                if ~isstruct(enteredAnalysis)   
+                    error('First argument must be a structure (analysis)')                    
+                else     % If it is, assign values to vocoder object only if field names match.               
+                    enteredFieldnames = fieldnames(enteredAnalysis);
+                    s = obj.analysis;
+                    for i = 1:length(enteredFieldnames)
+                       if ~isfield(s,enteredFieldnames{i})
+                           displayCommandWindow('Warning')
+                           warning('The field ''%s'' does not exist in the analysis property of the Vocoder class. Assignment has been ignored for this field.', enteredFieldnames{i})
+                       else
+                           s.(enteredFieldnames{i}) = enteredAnalysis.(enteredFieldnames{i});
+                       end                        
+                    end
+                    obj.analysis = s;
+                    
+                end
+                
             end
-            if nargin > 1
+            if nargin > 1 % Set synthesis structure
                 obj.synthesis = varargin{2};
             end
-            if nargin > 2
+            if nargin > 2 % Set envelope extraction structure
                 obj.envelopeExtraction = varargin{3};
             end
-            if nargin > 3
+            if nargin > 3 % Set mixed rates structure
                 obj.mixedRates = varargin{4};
             end
             
-            
+           displayCommandWindow('Complete') 
         end
         
         function obj = set.SampleRate(obj, fs)
@@ -101,6 +118,7 @@ classdef Vocoder
             end 
             
             % Recompute Analysis Filters
+            disp('Designing Analysis Filters')
             obj = designAnalysisFilters(obj);
         end
         
